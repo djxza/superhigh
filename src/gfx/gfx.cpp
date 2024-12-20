@@ -60,6 +60,13 @@ gfx::window_t::window_t(std::string title, u2 _size) {
     assert(this->handle && "Window failed to initialize!");
 
     glfwMakeContextCurrent(this->handle);
+
+	gladLoadGL();
+
+	glViewport(
+        0, 0, 
+        this->size.x,
+        this->size.y);
 }
 
 void gfx::window_t::swap_buffers()

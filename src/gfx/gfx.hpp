@@ -3,6 +3,8 @@
 #include <string>
 #include <cassert>
 
+#include "glad/glad.h"
+
 #include "GLFW/glfw3.h"
 #include "utils/utils.hpp"
 #include "global/global.hpp"
