@@ -11,6 +11,8 @@
 #include "glm.hpp"
 
 using u2 = glm::u32vec2;
+using f2 = glm::f64vec2;
+
 namespace gfx {
     class window_t {
             using handle_t  = GLFWwindow*;
@@ -29,6 +31,13 @@ namespace gfx {
             bool is_open() const;
             void swap_buffers();
 
+            bool is_pressed(int key) const;
+
+            void set_cursor_pos(f2 pos);
+            f2 get_cursor_pos() const;
+
+            void cursor_show();
+            void cursor_hide();
 
             void kill();
     };

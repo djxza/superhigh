@@ -18,6 +18,7 @@ CCFLAGS += $(INCFLAGS)
 
 INCFLAGS  = -I./lib/glfw/include
 INCFLAGS += -I./lib/glad/include
+INCFLAGS += -I./lib/glm
 INCFLAGS += -I./lib
 INCFLAGS += -I./src
 

@@ -4,6 +4,7 @@
 #include "gfx/shader.hpp"
 #include "gfx/vertex_object.hpp"
 #include "gfx/texture.hpp"
+#include "gfx/camera.hpp"
 
 int main(int ac, const char* argv[]) {
     gfx::window_t window("Project", { 800, 800 });
@@ -16,15 +17,20 @@ int main(int ac, const char* argv[]) {
 	// Vertices coordinates
 	// Vertices coordinates
 	std::vector<f32> vertices = {
-		-0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
-		-0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
-		0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
-		0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
+		-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+		-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+		0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+		0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	5.0f, 0.0f,
+		0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	2.5f, 5.0f
 	};
 
 	std::vector<GLuint> indices = {
-		0, 2, 1, // Upper triangle
-		0, 3, 2 // Lower triangle
+		0, 1, 2,
+		0, 2, 3,
+		0, 1, 4,
+		1, 2, 4,
+		2, 3, 4,
+		3, 0, 4
 	};
 
 	gfx::vao_t vao;
@@ -51,22 +57,31 @@ int main(int ac, const char* argv[]) {
 
 	auto uniid = glGetUniformLocation(program.get_handle(), "scale");
 
-	gfx::texture_t pop_cat("res/gfx/2d/pop_cat.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	gfx::texture_t pop_cat("res/gfx/2d/brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	pop_cat.unit(program, "tex0", 0);
+
+	glEnable(GL_DEPTH_TEST);
+
+	gfx::camera_t cam(800, 800, {0.0f, 0.0f, 2.0f});
 
     while(window.is_open())
 	{
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 		/*TODO: dodaj ovo u program.use*/
 		glUseProgram(program.get_handle());
+
+		cam.handle_inputs(window);
+
+			cam.matrix(45, 0.1f, 100, program, "cam_matrix");
+
 		glUniform1f(uniid, 0.5f);
 
 		pop_cat.bind();
 
 		vao.bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
 		window.swap_buffers();
 		glfwPollEvents();

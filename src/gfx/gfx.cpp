@@ -20,10 +20,10 @@ gfx::window_t::window_t(std::string title, u2 _size) {
     // Get monitor info
     int num_monitors;
     this->monitors = glfwGetMonitors(&num_monitors);
-    if (settings.monitor_index >= num_monitors) {
+    if (get_settings().monitor_index >= num_monitors) {
         utils::_throw("Failure", "Monitor index out of range");
     } else {
-        this->monitor = monitors[settings.monitor_index];
+        this->monitor = monitors[get_settings().monitor_index];
     }
 
     /* some sketchy casting here potential break? */
@@ -34,11 +34,13 @@ gfx::window_t::window_t(std::string title, u2 _size) {
     glfwDefaultWindowHints(); // Call this first to reset hints
 
     /* set to max refresh rate. */
-    if(settings.refresh_rate == -1) {
-        settings.refresh_rate = this->mode->refreshRate;
+    if(get_settings().refresh_rate == -1) {
+        auto update = get_settings();
+        update.refresh_rate = this->mode->refreshRate;
+        set_settings(update);
     }
 
-    glfwWindowHint(GLFW_REFRESH_RATE, settings.refresh_rate);
+    glfwWindowHint(GLFW_REFRESH_RATE, get_settings().refresh_rate);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -72,6 +74,34 @@ gfx::window_t::window_t(std::string title, u2 _size) {
 void gfx::window_t::swap_buffers()
 {
     glfwSwapBuffers(this->handle);
+}
+
+bool gfx::window_t::is_pressed(int key) const
+{
+    return glfwGetKey(this->handle, key);
+}
+
+void gfx::window_t::set_cursor_pos(f2 pos)
+{
+    glfwSetCursorPos(this->handle, pos.x, pos.y);
+}
+
+f2 gfx::window_t::get_cursor_pos() const
+{
+    f2 self;
+    glfwGetCursorPos(this->handle, &self.x, &self.y);
+
+    return self;
+}
+
+void gfx::window_t::cursor_hide()
+{
+    glfwSetInputMode(this->handle, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
+
+void gfx::window_t::cursor_show()
+{
+    glfwSetInputMode(this->handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 bool gfx::window_t::is_open() const {
